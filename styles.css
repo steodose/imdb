@@ -1,0 +1,145 @@
+/* Theme tokens (dataviz reference palette). Light is default; dark swaps below. */
+.viz-root {
+  color-scheme: light;
+  --page:            #f9f9f7;
+  --surface:         #fcfcfb;
+  --header-bg:       #101010;
+  --text-primary:    #0b0b0b;
+  --text-secondary:  #52514e;
+  --muted:           #898781;
+  --border:          rgba(11,11,11,0.10);
+  --tooltip-bg:      #101010;
+
+  /* Diverging rating scale poles + neutral midpoint (blue = above avg, red = below). */
+  --div-low:  #d03b3b; /* warm pole  */
+  --div-mid:  #f0efec; /* neutral    */
+  --div-high: #2a78d6; /* cool pole  */
+
+  /* Season-chart single-series hue (sequential blue). */
+  --series-1: #2a78d6;
+  --grid:     #e1e0d9;
+  --axis:     #c3c2b7;
+}
+
+@media (prefers-color-scheme: dark) {
+  .viz-root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page:           #0d0d0d;
+    --surface:        #1a1a19;
+    --header-bg:      #000000;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted:          #898781;
+    --border:         rgba(255,255,255,0.10);
+    --tooltip-bg:     #2c2c2a;
+    --div-low:  #e66767;
+    --div-mid:  #383835;
+    --div-high: #3987e5;
+    --series-1: #3987e5;
+    --grid:     #2c2c2a;
+    --axis:     #383835;
+  }
+}
+.viz-root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:           #0d0d0d;
+  --surface:        #1a1a19;
+  --header-bg:      #000000;
+  --text-primary:   #ffffff;
+  --text-secondary: #c3c2b7;
+  --muted:          #898781;
+  --border:         rgba(255,255,255,0.10);
+  --tooltip-bg:     #2c2c2a;
+  --div-low:  #e66767;
+  --div-mid:  #383835;
+  --div-high: #3987e5;
+  --series-1: #3987e5;
+  --grid:     #2c2c2a;
+  --axis:     #383835;
+}
+
+/* Base typeface — system monospace stack (matches the MLB scores site). */
+.viz-root, .viz-root button, .viz-root input, .viz-root select {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+/* Heatmap axis titles */
+.axis-title-x {
+  padding-left: 36px; /* clear the episode-number row-head column */
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.axis-title-y {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Heatmap grid */
+#heatmap {
+  display: grid;
+  gap: 2px; /* 2px surface gap between fills (dataviz mark spec) */
+}
+.hm-corner, .hm-col-head, .hm-row-head {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+.hm-row-head { justify-content: flex-end; padding-right: 6px; }
+.hm-cell {
+  min-height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+  transition: outline-color .12s ease;
+  outline: 2px solid transparent;
+}
+.hm-cell:hover { outline-color: var(--text-primary); }
+.hm-empty { background: transparent; }
+
+/* Legend gradient swatch */
+.legend-bar {
+  width: 120px; height: 10px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--div-low), var(--div-mid), var(--div-high));
+}
+
+/* Top-episodes rating pill/bar */
+.rating-bar-track {
+  position: relative; height: 22px; border-radius: 4px;
+  background: color-mix(in srgb, var(--series-1) 12%, transparent);
+  overflow: hidden;
+}
+.rating-bar-fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: color-mix(in srgb, var(--series-1) 30%, transparent);
+}
+.rating-bar-val {
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: flex-end;
+  height: 100%; padding-right: 6px; font-variant-numeric: tabular-nums; font-weight: 600;
+}
+
+/* Season chart */
+.sc-dot { fill: var(--series-1); }
+.sc-line { stroke: var(--series-1); stroke-width: 2; fill: none; }
+.sc-grid { stroke: var(--grid); stroke-width: 1; }
+.sc-axis-text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.sc-val-text { fill: var(--text-primary); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TV Series Ratings · IMDb</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['selector', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['ui-monospace', 'SFMono-Regular', '"SF Mono"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="viz-root min-h-screen bg-[var(--page)] text-[var(--text-primary)] antialiased">
+
+  <!-- Header -->
+  <header class="bg-[var(--header-bg)] text-white">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex items-center gap-4">
+      <img src="imdb-logo.png" alt="IMDb" class="h-8 w-auto rounded-md select-none" />
+      <h1 class="text-xl sm:text-2xl font-bold tracking-tight">TV Series Ratings</h1>
+      <div class="ml-auto flex items-center gap-3 sm:gap-4">
+        <span id="last-refreshed" class="hidden sm:inline text-xs text-white/60"></span>
+        <button id="theme-toggle" title="Toggle light / dark"
+          class="rounded-md border border-white/20 px-2.5 py-1 text-sm hover:bg-white/10 transition">🌗</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Show picker -->
+    <section class="flex flex-col sm:flex-row sm:items-end gap-3">
+      <div class="flex-1 max-w-md">
+        <label for="show-input" class="block text-xs font-medium text-[var(--text-secondary)] mb-1">Series</label>
+        <input id="show-input" list="show-list" autocomplete="off" placeholder="Search a show…"
+          class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-[var(--text-primary)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#f5c518]" />
+        <datalist id="show-list"></datalist>
+      </div>
+    </section>
+
+    <!-- KPI tiles -->
+    <section id="kpis" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></section>
+
+    <!-- Heatmap -->
+    <section class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5 shadow-sm">
+      <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+        <h2 class="text-base font-semibold">Episode ratings by season</h2>
+        <div id="legend" class="flex items-center gap-2 text-xs text-[var(--text-secondary)]"></div>
+      </div>
+      <div class="flex items-stretch gap-2">
+        <!-- Episode axis title (vertical) -->
+        <div class="axis-title-y">Episode</div>
+        <div class="flex-1 min-w-0">
+          <!-- Season axis title (offset over the data columns, past the row-head) -->
+          <div class="axis-title-x">Season</div>
+          <div class="overflow-x-auto">
+            <div id="heatmap" class="min-w-[520px]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom row: top episodes + season chart -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5 shadow-sm">
+        <h2 class="text-base font-semibold mb-3">All episodes</h2>
+        <div class="overflow-y-auto max-h-[420px]">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-[var(--surface)]">
+              <tr class="text-left text-[var(--text-secondary)] border-b border-[var(--border)]">
+                <th class="py-2 pr-2 font-medium">S·E</th>
+                <th class="py-2 pr-2 font-medium">Episode</th>
+                <th class="py-2 pl-2 font-medium text-right">Rating</th>
+              </tr>
+            </thead>
+            <tbody id="top-episodes"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5 shadow-sm">
+        <h2 class="text-base font-semibold mb-3">Average rating by season</h2>
+        <div id="season-chart" class="w-full"></div>
+      </div>
+    </section>
+
+    <footer class="pt-2 pb-8 text-center text-xs text-[var(--text-secondary)] space-y-2">
+      <div class="flex items-center justify-center gap-2 font-semibold text-[var(--text-primary)]">
+        <img src="btp-logo.png" alt="" class="h-5 w-5 rounded" />
+        <span>A Between the Pipes Project</span>
+      </div>
+      <div>
+        Data from the <a class="underline hover:text-[var(--text-primary)]" href="https://datasets.imdbws.com/" target="_blank" rel="noopener">official IMDb datasets</a> · <a class="underline hover:text-[var(--text-primary)]" href="https://github.com/steodose/imdb" target="_blank" rel="noopener">Source on GitHub</a> · Built by <a class="underline hover:text-[var(--text-primary)]" href="https://stephanteodosescu.com" target="_blank" rel="noopener">Stephan Teodosescu</a>
+      </div>
+    </footer>
+  </main>
+
+  <div id="tooltip" class="pointer-events-none fixed z-50 hidden rounded-lg bg-[var(--tooltip-bg)] text-white text-xs px-3 py-2 shadow-lg max-w-xs"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

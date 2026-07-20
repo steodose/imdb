@@ -41,6 +41,15 @@ whenever you want fresh ratings; each file is stamped with `lastRefreshed`.
 To add or remove shows, edit `data/series_urls.csv` (a `Series Name,ttXXXXXXX`
 row per show — the `tt…` id is from the show's IMDb URL) and rebuild.
 
+### Automated weekly refresh
+
+`.github/workflows/refresh-data.yml` re-runs the pipeline with `--refresh` every
+Monday (06:00 UTC) and commits the updated JSON only if ratings changed — so the
+live site stays current with no manual work. You can also trigger it any time from
+the repo's **Actions → Refresh IMDb data → Run workflow** button. Adding a show
+still requires editing `series_urls.csv` (then the next run picks it up, or run the
+workflow manually).
+
 ## 2. Run the site
 
 The page fetches local JSON, so it must be served over HTTP — opening

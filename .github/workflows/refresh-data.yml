@@ -1,0 +1,42 @@
+name: Refresh IMDb data
+
+# Rebuilds data/series/*.json from the latest official IMDb datasets.
+# Runs weekly, and can be triggered manually from the Actions tab.
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # every Monday 06:00 UTC
+  workflow_dispatch:        # manual "Run workflow" button
+
+permissions:
+  contents: write           # allow the job to push refreshed data back
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Rebuild data from latest IMDb datasets
+        run: python3 scripts/build_data.py --refresh
+
+      - name: Commit refreshed data if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/series
+          if git diff --cached --quiet; then
+            echo "No data changes — nothing to commit."
+          else
+            git commit -m "Auto-refresh IMDb data ($(date -u +%Y-%m-%d))"
+            git push
+          fi

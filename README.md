@@ -1,78 +1,62 @@
 # TV Series Ratings Dashboard
 
 An interactive dashboard of IMDb episode ratings for a curated set of TV shows —
-a season × episode heatmap, headline stats, a top-episodes table, and an average
+a season × episode heatmap, headline stats, an all-episodes table, and an average
 rating-by-season chart. A modern, buildless successor to an earlier Tableau
 dashboard and R/Shiny tool.
 
-![Concept: season × episode rating heatmap with KPI tiles](https://datasets.imdbws.com/)
+🔗 **Live:** https://steodose.github.io/imdb/
+
+![The dashboard showing Seinfeld's season-by-episode ratings heatmap](app_screenshot.png)
 
 ## How it works
 
-- **Data** comes from the official [IMDb datasets](https://datasets.imdbws.com/)
-  (`title.episode`, `title.ratings`, `title.basics`). A Python script joins them
-  into one small JSON file per show.
-- **Frontend** is plain HTML + vanilla JS with Tailwind via CDN — no build step,
-  no framework. It just fetches the prebuilt JSON.
+The project has two halves: a small Python **data pipeline** that turns the official
+IMDb datasets into compact JSON, and a **static frontend** that reads that JSON. There
+is no framework and no build step.
+
+### Data
+
+Ratings come from the official [IMDb datasets](https://datasets.imdbws.com/)
+(`title.episode`, `title.ratings`, `title.basics`), which IMDb refreshes daily.
+`scripts/build_data.py` (Python standard library only) downloads those files, joins
+each episode to its rating and title for every show listed in `data/series_urls.csv`,
+and writes one JSON file per show plus an `index.json` catalog into `data/series/`.
+Headline numbers are aggregated across episodes (average rating, summed votes), and
+each file is stamped with the date it was built.
+
+### Frontend
+
+`index.html`, `app.js`, and `styles.css` are the entire app — plain HTML and vanilla
+JavaScript with Tailwind loaded from a CDN. On load it reads the prebuilt JSON and
+renders the heatmap, KPI tiles, episode table, and season chart, with a searchable
+show picker, light/dark theming, and deep-linkable URLs (e.g. `?show=tt0903747`).
+Because it is fully static, it is served straight from GitHub Pages.
+
+### Staying current
+
+A scheduled GitHub Action (`.github/workflows/refresh-data.yml`) rebuilds the data
+each week from the latest IMDb datasets and commits it back only when something
+changed, so the published site keeps itself up to date. The curated lineup lives in
+`data/series_urls.csv` — one `Series Name,ttXXXXXXX` row per show, where the `tt…` id
+comes from the show's IMDb URL.
+
+## Project layout
 
 ```
 index.html            dashboard shell
 app.js                loads JSON, renders heatmap / tiles / table / chart
-styles.css            theme tokens + heatmap/chart styles
+styles.css            theme tokens + heatmap / chart styles
 data/
-  series_urls.csv     curated show list (input) — "Name,ttXXXXXXX" per row
-  series/             generated: index.json + one <imdbId>.json per show
-scripts/build_data.py the data pipeline
+  series_urls.csv     curated show list — "Name,ttXXXXXXX" per row
+  series/             generated JSON: index.json + one <imdbId>.json per show
+scripts/build_data.py the data pipeline (stdlib only)
+.github/workflows/    weekly data-refresh automation
 downloads/            raw IMDb .tsv.gz (gitignored)
 ```
 
-## 1. Build the data
+## Data & credits
 
-Requires Python 3 (stdlib only — no pip installs).
-
-```bash
-python3 scripts/build_data.py            # downloads TSVs if missing, then builds
-python3 scripts/build_data.py --refresh  # force re-download for fresh ratings
-```
-
-This writes `data/series/index.json` and `data/series/<imdbId>.json`. Re-run it
-whenever you want fresh ratings; each file is stamped with `lastRefreshed`.
-
-To add or remove shows, edit `data/series_urls.csv` (a `Series Name,ttXXXXXXX`
-row per show — the `tt…` id is from the show's IMDb URL) and rebuild.
-
-### Automated weekly refresh
-
-`.github/workflows/refresh-data.yml` re-runs the pipeline with `--refresh` every
-Monday (06:00 UTC) and commits the updated JSON only if ratings changed — so the
-live site stays current with no manual work. You can also trigger it any time from
-the repo's **Actions → Refresh IMDb data → Run workflow** button. Adding a show
-still requires editing `series_urls.csv` (then the next run picks it up, or run the
-workflow manually).
-
-## 2. Run the site
-
-The page fetches local JSON, so it must be served over HTTP — opening
-`index.html` via `file://` will not load data.
-
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
-
-Pick a show from the search box; deep-link with `?show=tt0098904`.
-
-## 3. Deploy
-
-It is fully static — push the repo to any static host:
-
-- **GitHub Pages:** enable Pages on the repo root (`/`).
-- **Netlify / Vercel:** no build command; publish directory is the repo root.
-
-Make sure `data/series/*.json` is committed (it is not gitignored; only
-`downloads/` is).
-
-## Data terms
-
-IMDb data is provided for **personal and non-commercial use** per IMDb's
-[dataset terms](https://www.imdb.com/interfaces/). This project is a personal tool.
+IMDb data is used under IMDb's [dataset terms](https://www.imdb.com/interfaces/) for
+personal, non-commercial use. A *Between the Pipes* project by
+[Stephan Teodosescu](https://stephanteodosescu.com).

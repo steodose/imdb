@@ -36,17 +36,16 @@ function textOn(rgb) {
   return L > 0.5 ? '#0b0b0b' : '#ffffff';
 }
 
-/* Diverging color scale centered on the show's mean rating.
-   below mean -> warm (div-low), at mean -> neutral, above -> cool (div-high). */
-function makeColorScale(mean, spread) {
-  const low = hexToRgb(cssVar('--div-low'));
-  const mid = hexToRgb(cssVar('--div-mid'));
-  const high = hexToRgb(cssVar('--div-high'));
-  const half = Math.max(spread, 0.5); // avoid div-by-zero / flat shows
+/* Sequential amber color scale over the show's rating range.
+   lowest rating -> pale amber (near surface), highest -> deep amber/orange. */
+function makeColorScale(min, max) {
+  const lo = hexToRgb(cssVar('--seq-lo'));
+  const hi = hexToRgb(cssVar('--seq-hi'));
+  const span = Math.max(max - min, 0.5); // avoid div-by-zero / flat shows
   return function (rating) {
-    let t = (rating - mean) / half;         // -1..+1 (clamped)
-    t = Math.max(-1, Math.min(1, t));
-    return t < 0 ? mix(mid, low, -t) : mix(mid, high, t);
+    let t = (rating - min) / span;          // 0..1 (clamped)
+    t = Math.max(0, Math.min(1, t));
+    return mix(lo, hi, t);
   };
 }
 
@@ -113,9 +112,10 @@ function renderHeatmap(show) {
   const grid = new Map(); // "s:e" -> episode
   for (const e of eps) grid.set(`${e.season}:${e.episode}`, e);
 
-  const mean = show.avgRating;
-  const spread = Math.max(...eps.map(e => Math.abs(e.rating - mean)));
-  const color = makeColorScale(mean, spread);
+  const ratings = eps.map(e => e.rating);
+  const minR = Math.min(...ratings);
+  const maxR = Math.max(...ratings);
+  const color = makeColorScale(minR, maxR);
 
   const hm = document.getElementById('heatmap');
   hm.style.gridTemplateColumns = `36px repeat(${seasons.length}, minmax(38px, 1fr))`;
@@ -141,7 +141,7 @@ function renderHeatmap(show) {
   attachTooltips(hm);
 
   document.getElementById('legend').innerHTML =
-    `<span>Below avg</span><span class="legend-bar"></span><span>Above avg</span>`;
+    `<span>${minR.toFixed(1)}</span><span class="legend-bar"></span><span>${maxR.toFixed(1)}</span>`;
 }
 
 function renderTopEpisodes(show) {

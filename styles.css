@@ -10,13 +10,12 @@
   --border:          rgba(11,11,11,0.10);
   --tooltip-bg:      #101010;
 
-  /* Diverging rating scale poles + neutral midpoint (blue = above avg, red = below). */
-  --div-low:  #d03b3b; /* warm pole  */
-  --div-mid:  #f0efec; /* neutral    */
-  --div-high: #2a78d6; /* cool pole  */
+  /* Sequential rating scale: pale gold (low) -> deep IMDb-gold (high). */
+  --seq-lo: #fef6d5; /* low rating  — recedes toward the light surface */
+  --seq-hi: #c68a00; /* high rating — deep golden yellow */
 
-  /* Season-chart single-series hue (sequential blue). */
-  --series-1: #2a78d6;
+  /* Season-chart single-series hue (gold, matches the heatmap). */
+  --series-1: #b8860b;
   --grid:     #e1e0d9;
   --axis:     #c3c2b7;
 }
@@ -32,10 +31,9 @@
     --muted:          #898781;
     --border:         rgba(255,255,255,0.10);
     --tooltip-bg:     #2c2c2a;
-    --div-low:  #e66767;
-    --div-mid:  #383835;
-    --div-high: #3987e5;
-    --series-1: #3987e5;
+    --seq-lo: #3a300a; /* low rating  — recedes toward the dark surface */
+    --seq-hi: #f5c518; /* high rating — IMDb gold */
+    --series-1: #f5c518;
     --grid:     #2c2c2a;
     --axis:     #383835;
   }
@@ -50,10 +48,9 @@
   --muted:          #898781;
   --border:         rgba(255,255,255,0.10);
   --tooltip-bg:     #2c2c2a;
-  --div-low:  #e66767;
-  --div-mid:  #383835;
-  --div-high: #3987e5;
-  --series-1: #3987e5;
+  --seq-lo: #3a2809; /* low rating  — recedes toward the dark surface */
+  --seq-hi: #fbbf24; /* high rating — bright amber */
+  --series-1: #f59e0b;
   --grid:     #2c2c2a;
   --axis:     #383835;
 }
@@ -119,7 +116,7 @@
 /* Legend gradient swatch */
 .legend-bar {
   width: 120px; height: 10px; border-radius: 999px;
-  background: linear-gradient(90deg, var(--div-low), var(--div-mid), var(--div-high));
+  background: linear-gradient(90deg, var(--seq-lo), var(--seq-hi));
 }
 
 /* Top-episodes rating pill/bar */

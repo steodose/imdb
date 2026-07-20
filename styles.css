@@ -48,9 +48,9 @@
   --muted:          #898781;
   --border:         rgba(255,255,255,0.10);
   --tooltip-bg:     #2c2c2a;
-  --seq-lo: #3a2809; /* low rating  — recedes toward the dark surface */
-  --seq-hi: #fbbf24; /* high rating — bright amber */
-  --series-1: #f59e0b;
+  --seq-lo: #3a300a; /* low rating  — recedes toward the dark surface */
+  --seq-hi: #f5c518; /* high rating — IMDb gold */
+  --series-1: #f5c518;
   --grid:     #2c2c2a;
   --axis:     #383835;
 }

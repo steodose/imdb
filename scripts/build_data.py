@@ -132,9 +132,11 @@ def build(series):
                 continue
 
     # 3) title.basics: tconst -> primaryTitle (episode names + series names)
+    #    and startYear (the episode's air year; IMDb has no full air date)
     log("  scanning title.basics (large, streaming) ...")
     wanted_titles = set(episodes) | parents
     titles = {}
+    years = {}
     with open_tsv("title.basics.tsv.gz") as f:
         reader = csv.reader(f, delimiter="\t")
         next(reader, None)
@@ -145,6 +147,8 @@ def build(series):
             if tconst not in wanted_titles:
                 continue
             titles[tconst] = row[2]  # primaryTitle
+            if len(row) > 5 and row[5].isdigit():
+                years[tconst] = int(row[5])  # startYear
             if len(titles) == len(wanted_titles):
                 break
 
@@ -165,13 +169,16 @@ def build(series):
             r = ratings.get(etid)
             if r is None:
                 continue  # no rating -> skip (blank cell)
-            eps.append({
+            e = {
                 "season": season,
                 "episode": ep,
                 "title": titles.get(etid, f"Episode {ep}"),
                 "rating": round(r[0], 1),
                 "votes": r[1],
-            })
+            }
+            if etid in years:
+                e["year"] = years[etid]
+            eps.append(e)
         if not eps:
             empty.append(name)
             continue

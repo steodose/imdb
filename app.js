@@ -133,7 +133,7 @@ function renderHeatmap(show) {
       const fg = textOn(bg);
       parts.push(
         `<div class="hm-cell" style="background:${rgbStr(bg)};color:${fg}"
-           data-tip="S${e.season}E${e.episode} · ${escapeHtml(e.title)}||★ ${e.rating.toFixed(1)} · ${fmtVotes(e.votes)} votes">${e.rating.toFixed(1)}</div>`
+           data-tip="S${e.season}E${e.episode} · ${escapeHtml(e.title)}${e.year ? ` (${e.year})` : ''}||★ ${e.rating.toFixed(1)} · ${fmtVotes(e.votes)} votes">${e.rating.toFixed(1)}</div>`
       );
     }
   }
